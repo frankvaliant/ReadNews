@@ -1,4 +1,4 @@
-package com.readnews.chengwei.readnews;
+package com.readnews.chengwei.app;
 
 import org.junit.Test;
 

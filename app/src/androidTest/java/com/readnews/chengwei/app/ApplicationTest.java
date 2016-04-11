@@ -1,4 +1,4 @@
-package com.readnews.chengwei.readnews;
+package com.readnews.chengwei.app;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
