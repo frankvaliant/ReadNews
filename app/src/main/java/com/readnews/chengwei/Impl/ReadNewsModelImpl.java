@@ -1,9 +1,11 @@
 package com.readnews.chengwei.Impl;
 
 import android.content.Context;
+import android.os.Handler;
 
 import com.readnews.chengwei.bean.News;
 import com.readnews.chengwei.model.ReadNewsModel;
+import com.readnews.chengwei.thread.DataThread;
 import com.readnews.chengwei.utils.FileUtils;
 
 import java.io.IOException;
@@ -15,6 +17,16 @@ import java.util.List;
  * Created by chengwei on 16/4/11.
  */
 public class ReadNewsModelImpl implements ReadNewsModel{
+
+   static ReadNewsModelImpl readNewsModel;
+    private DataThread thread;
+    synchronized public static ReadNewsModelImpl getInstant(){
+        if(readNewsModel==null){
+            readNewsModel= new ReadNewsModelImpl();
+        }
+
+        return readNewsModel;
+    }
 
     @Override
     public List<News> getListFile(Context context,String[] path) throws IOException {
@@ -40,5 +52,15 @@ public class ReadNewsModelImpl implements ReadNewsModel{
 
     public News getFile(Context context,String path) throws IOException{
         return FileUtils.readAssetsFile(context.getAssets().open(path),false);
+    }
+
+    public void setData(Context context, Handler handler) throws IOException {
+        thread = new DataThread(context,handler);
+        thread.start();
+    }
+
+    public void setData(Context context, Handler handler,int index) throws IOException {
+        thread = new DataThread(context,handler,false,index);
+        thread.start();
     }
 }

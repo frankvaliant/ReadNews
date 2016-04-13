@@ -25,6 +25,7 @@ public class FileUtils {
         News news = new News();
         while((line = br.readLine())!=null){
             if(flag){
+                flag = false;
                 news.setTitle(line);
                 if(isTitle) return news;
             } else {

@@ -2,22 +2,24 @@ package com.readnews.chengwei.app.fragment;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.readnews.chengwei.Impl.ReadNewsModelImpl;
 import com.readnews.chengwei.app.R;
 import com.readnews.chengwei.contants.Path;
+import com.readnews.chengwei.thread.DataThread;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.LogRecord;
 
 import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter;
 
@@ -29,35 +31,41 @@ public class ListFragment extends Fragment {
     OnSelcetTitleListener listener;
     RecyclerView recyclerView;
     List<String> list;
-
+    DataThread thread;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_list,null);
         recyclerView = (RecyclerView)view.findViewById(R.id.rv);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         try {
-            list = setData();
+            ReadNewsModelImpl.getInstant().setData(getActivity(),handler);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        MyAdapter adapter = new MyAdapter();
-        adapter.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(View parent, int position) {
-                listener.selectTitle(position);
 
-            }
-        });
-        AlphaInAnimationAdapter alphaAdapter = new AlphaInAnimationAdapter(adapter);
-        recyclerView.setAdapter(alphaAdapter);
-        recyclerView.addItemDecoration(new RecycleViewDivider(getActivity(),LinearLayoutManager.HORIZONTAL));
         return view;
     }
 
-    private List<String> setData() throws IOException {
-        ReadNewsModelImpl readNewsModelImpl = new ReadNewsModelImpl();
-        return readNewsModelImpl.getListTitleFile(getActivity(), Path.PATH);
-    }
+    Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+           list = (List<String>) msg.obj;
+            MyAdapter adapter = new MyAdapter();
+            adapter.setOnItemClickListener(new OnItemClickListener() {
+                @Override
+                public void onItemClick(View parent, int position) {
+                    listener.selectTitle(position);
+
+                }
+            });
+            AlphaInAnimationAdapter alphaAdapter = new AlphaInAnimationAdapter(adapter);
+            recyclerView.setAdapter(alphaAdapter);
+            recyclerView.addItemDecoration(new RecycleViewDivider(getActivity(),LinearLayoutManager.HORIZONTAL));
+
+        }
+    };
+
+
 
     @Override
     public void onAttach(Activity context) {
@@ -119,5 +127,6 @@ public class ListFragment extends Fragment {
 
         }
     }
+
 
 }
