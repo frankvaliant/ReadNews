@@ -9,7 +9,6 @@ import com.readnews.chengwei.thread.DataThread;
 import com.readnews.chengwei.utils.FileUtils;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +16,7 @@ import java.util.List;
  * Created by chengwei on 16/4/11.
  */
 public class ReadNewsModelImpl implements ReadNewsModel{
-
+    private boolean flag;
    static ReadNewsModelImpl readNewsModel;
     private DataThread thread;
     synchronized public static ReadNewsModelImpl getInstant(){
@@ -55,12 +54,28 @@ public class ReadNewsModelImpl implements ReadNewsModel{
     }
 
     public void setData(Context context, Handler handler) throws IOException {
-        thread = new DataThread(context,handler);
-        thread.start();
+        thread = new DataThread(context,handler,flag);
+        if(flag){
+            thread.start();
+        }else {
+            thread.interrupt();
+            thread = null;
+        }
     }
 
     public void setData(Context context, Handler handler,int index) throws IOException {
-        thread = new DataThread(context,handler,false,index);
-        thread.start();
+
+        thread = new DataThread(context,handler,false,index,flag);
+        if(flag){
+            thread.start();
+        }else {
+            thread.interrupt();
+            thread = null;
+        }
+
+    }
+
+    public void setThreadFlag(boolean flag){
+        this.flag = flag;
     }
 }
